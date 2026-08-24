@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>GNR1007 · เกมบทเรียนอินเทอร์แอคทีฟ | มหาวิทยาลัยรามคำแหง</title>
+<meta name="description" content="ชุดเกมบทเรียนอินเทอร์แอคทีฟ 10 เกม วิชา GNR1007 การโปรแกรมคอมพิวเตอร์สำหรับวิศวกร คณะวิศวกรรมศาสตร์ มหาวิทยาลัยรามคำแหง">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b0f14'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%F0%9F%8E%AE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ===================== ธีม (dark = ค่าเริ่มต้น, light = override) ===================== */
+:root{
+  --bg:#05070c; --surface:#0d121b; --surface2:#141c29; --card-1:rgba(22,29,42,.72); --card-2:rgba(11,15,23,.9);
+  --text:#eaf0f8; --muted:#8ea0b8; --muted2:#5f7086;
+  --gold:#fbbf24; --gold2:#ffd76a; --green:#4ade80; --red:#fb7185;
+  --line:rgba(255,255,255,.08); --grid:rgba(255,255,255,.035);
+  --watermark:rgba(255,255,255,.09);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 60px rgba(0,0,0,.5);
+  --gate-bg:rgba(3,5,9,.94);
+  --input-bg:rgba(255,255,255,.06);
+  --scheme:dark;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f3f5f9; --surface:#ffffff; --surface2:#ffffff; --card-1:rgba(255,255,255,.94); --card-2:rgba(238,241,247,.94);
+  --text:#121826; --muted:#4a5670; --muted2:#71809a;
+  --gold:#a8660a; --gold2:#c9860f; --green:#1a8f4c; --red:#d13a54;
+  --line:rgba(18,24,38,.10); --grid:rgba(18,24,38,.04);
+  --watermark:rgba(18,24,38,.065);
+  --shadow:0 1px 2px rgba(20,30,50,.06), 0 20px 46px rgba(20,30,50,.10);
+  --gate-bg:rgba(243,245,249,.96);
+  --input-bg:rgba(18,24,38,.045);
+  --scheme:light;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 560px at 12% -8%, rgba(96,140,255,.10), transparent 60%),
+    radial-gradient(900px 520px at 100% 10%, rgba(251,191,36,.07), transparent 55%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:'IBM Plex Sans Thai','Sarabun',system-ui,sans-serif;
+  font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  transition:background-color .25s ease, color .25s ease;
+}
+
+/* ---------- ลายน้ำมินิมอล: วงเล็บโค้ด + จุดวงจร (สี = --watermark ปรับตามธีมอัตโนมัติ) ---------- */
+.watermark{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-color:var(--watermark);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Ctext x='6' y='44' font-family='IBM Plex Mono,monospace' font-weight='700' font-size='30' fill='%23000'%3E%3C/%3E%3C/text%3E%3Ccircle cx='186' cy='118' r='3.2' fill='%23000'/%3E%3Ccircle cx='40' cy='168' r='3.2' fill='%23000'/%3E%3Cpath d='M148 188 L172 188 L172 212' stroke='%23000' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
+  mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Ctext x='6' y='44' font-family='IBM Plex Mono,monospace' font-weight='700' font-size='30' fill='%23000'%3E%3C/%3E%3C/text%3E%3Ccircle cx='186' cy='118' r='3.2' fill='%23000'/%3E%3Ccircle cx='40' cy='168' r='3.2' fill='%23000'/%3E%3Cpath d='M148 188 L172 188 L172 212' stroke='%23000' stroke-width='2.2' fill='none'/%3E%3C/svg%3E");
+  -webkit-mask-repeat:repeat; mask-repeat:repeat;
+  -webkit-mask-size:220px 220px; mask-size:220px 220px;
+}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:34px 20px 70px}
+
+/* ---------- theme toggle ---------- */
+.theme-toggle{
+  position:fixed; top:16px; right:16px; z-index:40;
+  width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface2); color:var(--text); cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow); transition:transform .15s ease;
+}
+.theme-toggle:hover{transform:translateY(-2px)}
+.theme-toggle svg{width:19px;height:19px}
+.theme-toggle .i-sun{display:none}
+:root[data-theme="light"] .theme-toggle .i-moon{display:none}
+:root[data-theme="light"] .theme-toggle .i-sun{display:block}
+
+/* ---------- header ---------- */
+header{padding:8px 4px 30px;border-bottom:1px solid var(--line);margin-bottom:36px;opacity:0;transform:translateY(10px);animation:rise .6s ease forwards}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 12px;display:flex;align-items:center;gap:10px
+}
+.eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);display:inline-block}
+h1{
+  font-family:'Bai Jamjuree',sans-serif;font-weight:700;font-size:clamp(1.7rem,4.6vw,2.7rem);
+  margin:0 0 10px;letter-spacing:-.01em;line-height:1.16;text-wrap:balance;
+}
+h1 span{color:var(--gold)}
+.lede{color:var(--muted);max-width:64ch;margin:0 0 8px;font-size:.98rem}
+.hype{
+  font-family:'Bai Jamjuree',sans-serif;font-weight:600;font-size:1rem;color:var(--text);
+  margin:0 0 22px;display:flex;align-items:center;gap:8px
+}
+.hype .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb, var(--green) 20%, transparent);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stat{background:var(--surface);padding:14px 16px}
+.stat b{display:block;font-family:'Bai Jamjuree',sans-serif;font-weight:700;font-size:1.28rem;color:var(--gold2)}
+.stat span{display:block;font-size:.72rem;color:var(--muted2);margin-top:2px;letter-spacing:.02em}
+
+/* ---------- day sections ---------- */
+.day{margin-bottom:44px;opacity:0;transform:translateY(10px);animation:rise .6s ease forwards}
+.day:nth-of-type(1){animation-delay:.05s}
+.day:nth-of-type(2){animation-delay:.12s}
+.day:nth-of-type(3){animation-delay:.19s}
+.day-head{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.day-badge{
+  font-family:'IBM Plex Mono',monospace;font-size:.74rem;font-weight:600;letter-spacing:.06em;
+  border:1px solid var(--line);border-radius:999px;padding:5px 14px;white-space:nowrap;
+}
+.day-badge.done{color:var(--green);border-color:color-mix(in srgb, var(--green) 40%, transparent);background:color-mix(in srgb, var(--green) 10%, transparent)}
+.day-badge.next{color:var(--gold);border-color:color-mix(in srgb, var(--gold) 40%, transparent);background:color-mix(in srgb, var(--gold) 10%, transparent)}
+.day-title{font-family:'Bai Jamjuree',sans-serif;font-weight:600;font-size:1.12rem;margin:0}
+.day-sub{color:var(--muted2);font-size:.84rem;margin-left:auto}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px}
+
+/* ---------- card ---------- */
+.card{
+  position:relative;border-radius:16px;padding:20px 20px 18px;
+  background:linear-gradient(180deg,var(--card-1),var(--card-2));
+  border:1px solid var(--line);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:12px;min-height:190px;
+  text-decoration:none;color:inherit;transition:transform .15s ease, border-color .15s ease;
+}
+.card:hover, .card:focus-visible{transform:translateY(-3px)}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:16px;padding:1px;
+  background:linear-gradient(135deg, var(--acc,transparent), transparent 46%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+}
+.card .num{
+  font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--acc,var(--muted));
+  letter-spacing:.14em;font-weight:600;
+}
+.card h3{
+  font-family:'Bai Jamjuree',sans-serif;font-weight:700;font-size:1.14rem;margin:0;line-height:1.28;
+}
+.card h3 small{display:block;font-family:'IBM Plex Sans Thai',sans-serif;font-weight:500;font-size:.82rem;color:var(--muted);margin-top:3px}
+.card .topics{
+  font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--muted2);letter-spacing:.01em;
+  line-height:1.5;
+}
+.card .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.pill{
+  font-size:.7rem;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);
+  font-family:'IBM Plex Mono',monospace;
+}
+.card .play{
+  margin-top:2px;display:flex;align-items:center;justify-content:space-between;
+  font-family:'Bai Jamjuree',sans-serif;font-weight:600;font-size:.92rem;color:var(--acc,var(--gold));
+}
+.card .play .arrow{transition:transform .15s ease}
+.card:hover .play .arrow{transform:translateX(4px)}
+
+/* ---------- footer ---------- */
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:.82rem;color:var(--muted2);display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+footer .credit{color:var(--muted)}
+footer a{color:inherit}
+
+@media (max-width:520px){
+  .wrap{padding:22px 14px 50px}
+  .day-sub{margin-left:0;width:100%}
+}
+
+/* ===================== ด่านรหัสผ่าน ===================== */
+#gate{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:var(--gate-bg); backdrop-filter:blur(6px); padding:20px;
+  transition:opacity .35s ease, visibility .35s ease;
+}
+#gate.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.gate-card{
+  width:100%;max-width:380px;border:1px solid var(--line);border-radius:20px;padding:32px 28px 26px;
+  background:var(--surface);box-shadow:var(--shadow);text-align:center;
+}
+.gate-icon{
+  width:56px;height:56px;border-radius:16px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg, rgba(251,191,36,.18), rgba(74,222,128,.14)); border:1px solid var(--line);
+}
+.gate-icon svg{width:26px;height:26px;color:var(--gold)}
+.gate-card h2{font-family:'Bai Jamjuree',sans-serif;font-weight:700;font-size:1.24rem;margin:0 0 8px}
+.gate-card p{color:var(--muted);font-size:.86rem;margin:0 0 20px;line-height:1.6}
+#gateInput{
+  width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--input-bg);
+  color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:1.15rem;letter-spacing:.12em;text-align:center;
+  outline:none;transition:border-color .15s ease;
+}
+#gateInput:focus{border-color:var(--gold)}
+.gate-hint{margin-top:10px;font-size:.72rem;color:var(--muted2);font-family:'IBM Plex Mono',monospace}
+.gate-err{margin-top:10px;font-size:.78rem;color:var(--red);min-height:1.1em;visibility:hidden}
+.gate-err.show{visibility:visible}
+#gateSubmit{
+  margin-top:16px;width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1a1204;font-weight:700;
+  font-family:'Bai Jamjuree',sans-serif;font-size:1rem;transition:transform .12s ease;
+}
+#gateSubmit:active{transform:scale(.98)}
+.gate-foot{margin-top:18px;font-size:.72rem;color:var(--muted2)}
+</style>
+</head>
+<body data-theme="dark">
+
+<div class="watermark" aria-hidden="true"></div>
+
+<!-- ===================== ด่านรหัสผ่าน ===================== -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    </div>
+    <h2>ยืนยันตัวก่อนเข้าสนาม</h2>
+    <p>กรอกรหัสนักศึกษา 10 หลัก (ขึ้นต้นด้วย 69) เพื่อเข้าสู่ชุดเกมบทเรียน GNR1007</p>
+    <input id="gateInput" type="tel" inputmode="numeric" maxlength="10" placeholder="69XXXXXXXX" autocomplete="off">
+    <div class="gate-err" id="gateErr">รูปแบบไม่ถูกต้อง ต้องเป็นตัวเลข 10 หลัก ขึ้นต้นด้วย 69</div>
+    <button id="gateSubmit">เข้าสู่สนามแข่ง</button>
+    <div class="gate-hint">คำใบ้: xxxxxxxx96-r</div>
+    <div class="gate-foot">GNR1007 · การโปรแกรมคอมพิวเตอร์สำหรับวิศวกร</div>
+  </div>
+</div>
+
+<!-- ===================== ปุ่มสลับธีม ===================== -->
+<button class="theme-toggle" id="themeToggle" aria-label="สลับโหมดสว่าง/มืด">
+  <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.4A9 9 0 1 1 11.6 3 7 7 0 0 0 21 12.4Z"/></svg>
+  <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>
+</button>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">GNR1007 · Learning Game Series</p>
+    <h1>เกมบทเรียนอินเทอร์แอคทีฟ <span>ทั้ง 10 เกม</span></h1>
+    <p class="lede">การโปรแกรมคอมพิวเตอร์สำหรับวิศวกร — เล่นบนมือถือได้ทันที แตะอย่างเดียว ไม่ต้องติดตั้งแอป แต่ละเกมมีคลังข้อสอบ 36 ข้อ พร้อมเฉลยและคำอธิบายครบทุกข้อ</p>
+    <p class="hype"><span class="dot"></span>พร้อมพิชิตทุกด่านหรือยัง — เลือกภารกิจแล้วเริ่มไต่อันดับได้เลย</p>
+    <div class="stat-row">
+      <div class="stat"><b>10</b><span>เกมทั้งหมด</span></div>
+      <div class="stat"><b>360</b><span>ข้อสอบรวม (36 ข้อ/เกม)</span></div>
+      <div class="stat"><b>6★</b><span>ดาวเต็มต่อเกม</span></div>
+      <div class="stat"><b>3</b><span>วันเรียนที่ครอบคลุม</span></div>
+    </div>
+  </header>
+
+  <!-- ===================== DAY 1 ===================== -->
+  <section class="day" id="day1">
+    <div class="day-head">
+      <span class="day-badge done">สอนวันที่ 1 · 8 ส.ค. 2569</span>
+      <h2 class="day-title">พื้นฐานเครื่องและข้อมูล</h2>
+      <span class="day-sub">บทที่ 1–4</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" style="--acc:#22d3ee" href="game1_cpu_city.html">
+        <span class="num">GAME 01</span>
+        <h3>CPU CITY<small>เมืองแห่งหน่วยประมวลผล</small></h3>
+        <p class="topics">MEMORY · TRANSLATION · NETWORK</p>
+        <div class="meta"><span class="pill">บทที่ 1–2</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#d4a843" href="game2_memory_vault.html">
+        <span class="num">GAME 02</span>
+        <h3>MEMORY VAULT<small>ห้องนิรภัยความจำ</small></h3>
+        <p class="topics">SIZING · OVERFLOW · CASTING</p>
+        <div class="meta"><span class="pill">บทที่ 3</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#ff5b3c" href="game3_operator_arena.html">
+        <span class="num">GAME 03</span>
+        <h3>OPERATOR ARENA<small>สังเวียนประลองตัวดำเนินการ</small></h3>
+        <p class="topics">PRECEDENCE · PREFIX/POSTFIX · MODULO</p>
+        <div class="meta"><span class="pill">บทที่ 4</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ===================== DAY 2 ===================== -->
+  <section class="day" id="day2">
+    <div class="day-head">
+      <span class="day-badge done">สอนวันที่ 2 · 22 ส.ค. 2569</span>
+      <h2 class="day-title">โครงสร้างควบคุมและการวนซ้ำ</h2>
+      <span class="day-sub">บทที่ 5</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" style="--acc:#c084fc" href="game4_logic_labyrinth.html">
+        <span class="num">GAME 04</span>
+        <h3>LOGIC LABYRINTH<small>เขาวงกตแห่งเงื่อนไข</small></h3>
+        <p class="topics">IF · ELSE IF · ELSE · SWITCH-CASE · BREAK</p>
+        <div class="meta"><span class="pill">บทที่ 5</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#f59e0b" href="game5_loop_factory.html">
+        <span class="num">GAME 05</span>
+        <h3>LOOP FACTORY<small>โรงงานวนซ้ำ</small></h3>
+        <p class="topics">FOR · WHILE · DO-WHILE · INFINITE LOOP</p>
+        <div class="meta"><span class="pill">บทที่ 5</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#e2b96b" href="game6_trace_detective.html">
+        <span class="num">GAME 06</span>
+        <h3>TRACE DETECTIVE<small>สำนักสืบรหัสลับ</small></h3>
+        <p class="topics">TRACE TABLE · ++x vs x++ · LOOP+MODULO · NESTED</p>
+        <div class="meta"><span class="pill">บทที่ 5</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ===================== DAY 3 ===================== -->
+  <section class="day" id="day3">
+    <div class="day-head">
+      <span class="day-badge next" id="day3badge">สอนวันที่ 3 · 5 ก.ย. 2569</span>
+      <h2 class="day-title">ฟังก์ชัน อาร์เรย์ และผังงาน</h2>
+      <span class="day-sub">บทที่ 6, 7a, 10</span>
+    </div>
+    <div class="grid">
+
+      <a class="card" style="--acc:#5cc8ff" href="game7_circuit_blueprint.html">
+        <span class="num">GAME 07</span>
+        <h3>CIRCUIT BLUEPRINT<small>พิมพ์เขียวสนามแข่ง</small></h3>
+        <p class="topics">TERMINATOR · PROCESS · DECISION · I/O · LOOP</p>
+        <div class="meta"><span class="pill">บทที่ 10 Flowchart</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#ff7a45" href="game8_pit_crew.html">
+        <span class="num">GAME 08</span>
+        <h3>PIT CREW<small>ทีมช่างพิทสต็อป</small></h3>
+        <p class="topics">PARAMETER · RETURN · PASS BY VALUE · LOCAL/GLOBAL</p>
+        <div class="meta"><span class="pill">บทที่ 6 ฟังก์ชัน</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#35e07f" href="game9_lap_timer.html">
+        <span class="num">GAME 09</span>
+        <h3>LAP TIMER<small>ตารางเวลาต่อรอบ</small></h3>
+        <p class="topics">INDEX 0 · LOOP · STRING · OUT OF BOUNDS</p>
+        <div class="meta"><span class="pill">บทที่ 7a อาร์เรย์</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+      <a class="card" style="--acc:#b18aff" href="game10_championship.html">
+        <span class="num">GAME 10</span>
+        <h3>CHAMPIONSHIP FINAL<small>รอบชิงแชมป์ (ทบทวนรวม)</small></h3>
+        <p class="topics">7 LAPS · 7 CHAPTERS · 108 SEC EACH</p>
+        <div class="meta"><span class="pill">บทที่ 1–7a, 10</span><span class="pill">36 ข้อ</span></div>
+        <div class="play">เล่นเกม <span class="arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+
+  <footer>
+    <span class="credit">ผศ.ดร.กุลวลัญช์ วรุณสิน · สาขาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยรามคำแหง</span>
+    <span>GNR1007 · Learning Game Series · index v2.0</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- ธีม สว่าง/มืด (จำค่าไว้ใช้ร่วมกันทุกหน้าในโดเมนเดียวกัน) ---------- */
+  var THEME_KEY = 'gnr1007_theme';
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    document.body.setAttribute('data-theme', t);
+  }
+  var savedTheme = null;
+  try{ savedTheme = localStorage.getItem(THEME_KEY); }catch(e){}
+  if (!savedTheme){
+    savedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  applyTheme(savedTheme);
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    applyTheme(cur);
+    try{ localStorage.setItem(THEME_KEY, cur); }catch(e){}
+  });
+
+  /* ---------- ป้ายวันสอนที่ 3: อัปเดตอัตโนมัติเมื่อพ้นวันที่ 5 ก.ย. 2569 (ไม่ล็อกการเข้าเล่น) ---------- */
+  try{
+    var day3 = new Date('2026-09-05T23:59:59+07:00');
+    var badge = document.getElementById('day3badge');
+    if (badge && new Date() > day3){
+      badge.textContent = 'สอนวันที่ 3 · 5 ก.ย. 2569 (สอนแล้ว)';
+      badge.classList.remove('next'); badge.classList.add('done');
+    }
+  }catch(e){}
+
+  /* ---------- ด่านรหัสผ่าน: รหัสนักศึกษา 10 หลัก ขึ้นต้นด้วย 69 ---------- */
+  var GATE_KEY = 'gnr1007_gate_ok';
+  var gate = document.getElementById('gate');
+  var input = document.getElementById('gateInput');
+  var err = document.getElementById('gateErr');
+  var submitBtn = document.getElementById('gateSubmit');
+  var PATTERN = /^69\d{8}$/;
+
+  function passedAlready(){
+    try{ return sessionStorage.getItem(GATE_KEY) === '1'; }catch(e){ return false; }
+  }
+  function markPassed(){
+    try{ sessionStorage.setItem(GATE_KEY, '1'); }catch(e){}
+  }
+  function tryUnlock(){
+    var v = (input.value || '').trim();
+    if (PATTERN.test(v)){
+      markPassed();
+      gate.classList.add('hidden');
+      err.classList.remove('show');
+    } else {
+      err.classList.add('show');
+      input.focus();
+    }
+  }
+  if (passedAlready()){
+    gate.classList.add('hidden');
+  }
+  input.addEventListener('input', function(){
+    input.value = input.value.replace(/\D/g,'').slice(0,10);
+    err.classList.remove('show');
+  });
+  input.addEventListener('keydown', function(e){ if (e.key === 'Enter') tryUnlock(); });
+  submitBtn.addEventListener('click', tryUnlock);
+})();
+</script>
+</body>
+</html>
