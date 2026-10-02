@@ -371,5 +371,61 @@
   setupChrome(); setupLogin(); setupArcade(); wrap();
   if(window.MutationObserver){ new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var n=ms[i].target; if(n.closest && !n.closest('#arcade') && !n.closest('.chartbox')){ queueSvgFix(); return; } } }).observe(document.body,{childList:true,subtree:true}); }
   queueSvgFix();
-  var foot=document.querySelector('footer .fmono'); if(foot) foot.textContent+=' · UI v7.0';
+  var foot=document.querySelector('footer .fmono'); if(foot) foot.textContent+=' · UI v7.1';
+})();
+
+/* ---------- 5) จอคอมพิวเตอร์: จัดหน้าบทเรียนเป็น 2 คอลัมน์ (UI v7.1) ----------
+   ห่อเนื้อหาเป็นกลุ่ม (หัวข้อ h3 ติดกับเนื้อหาถัดไป · ห้องทดลองทั้งชุดเป็นกลุ่มเดียว) แล้วให้ CSS แบ่งคอลัมน์
+   ย้ายโหนดเดิม ไม่คัดลอก จึงไม่กระทบ id/ตัวจัดการเหตุการณ์ของเกม · จอเล็กกว่า 1200px กลุ่มเป็น display:contents (เหมือนเดิม) */
+(function(){
+  'use strict';
+  var IDS=/^scr-(lesson\d|pitwalk)$/;
+  function blk(){ var d=document.createElement('div'); d.className='gnr-blk'; return d; }
+  function isText(n){ return n.tagName==='P' || n.classList.contains('status-line') || n.classList.contains('readout-line'); }
+  function build(sec){
+    var panel=sec.querySelector(':scope>.panel'); if(!panel||panel.querySelector('.gnr-flow')) return;
+    var kids=[].slice.call(panel.children), i=0;
+    while(i<kids.length && (kids[i].classList.contains('tag')||/^H[12]$/.test(kids[i].tagName))) i++;   /* หัวเรื่องอยู่นอกคอลัมน์ */
+    var end=kids.length; if(end>i && kids[end-1].classList.contains('btn-row')) end--;                     /* ปุ่มไปต่อท้ายสุดอยู่นอกคอลัมน์ */
+    var body=kids.slice(i,end); if(body.length<3) return;
+    var flow=document.createElement('div'); flow.className='gnr-flow';
+    panel.insertBefore(flow, kids[end]||null);
+    var cur=null, keep=0, lab=false;
+    body.forEach(function(n){
+      if(n.tagName==='H3'){ lab=/ห้องทดลอง|LAB|ทดลอง/i.test(n.textContent); cur=blk(); if(lab) cur.classList.add('gnr-lab'); flow.appendChild(cur); cur.appendChild(n); keep=1; return; }
+      if(lab){ cur.appendChild(n); return; }
+      if(cur && keep){ cur.appendChild(n); if(!isText(n)) keep=0; return; }
+      if(isText(n) && cur && cur.lastElementChild && isText(cur.lastElementChild)){ cur.appendChild(n); return; }
+      cur=blk(); flow.appendChild(cur); cur.appendChild(n);
+      if(isText(n)) keep=1; else keep=0;   /* ย่อหน้าบรรยายติดกับภาพ/ตารางที่ตามมา */
+    });
+    sec.classList.add('gnr-cols');
+  }
+  /* ย่อทั้งหน้าลงเล็กน้อย (ไม่ต่ำกว่า 80% · จอกว้าง >= 1700px ไม่ต่ำกว่า 75%) เมื่อเนื้อหายาวเกินจอไม่มาก เพื่อให้ไม่ต้องเลื่อน · เฉพาะจอคอม (กว้าง >= 1100px และใช้เมาส์) */
+  var MINZ=0.8, fitT=0, fitting=false;
+  function desk(){ return innerWidth>=1100 && !(window.matchMedia && matchMedia('(pointer:coarse)').matches); }
+  function fit(){
+    if(fitting) return; fitting=true;
+    var a=document.querySelector('.screen.active'), z=1;
+    [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ if(s!==a) s.style.zoom=''; });
+    if(a && desk() && !document.body.classList.contains('gnr-sum')){
+      a.style.zoom='';
+      var doc=document.documentElement.scrollHeight, h=a.getBoundingClientRect().height, over=doc-innerHeight;
+      if(over>2 && h>0){ z=Math.max(innerWidth>=1700?0.75:MINZ, Math.floor((h-over-6)/h*100)/100); }
+      a.style.zoom = z<1 ? String(z) : '';
+    } else if(a){ a.style.zoom=''; }
+    fitting=false;
+  }
+  function queueFit(){ clearTimeout(fitT); fitT=setTimeout(fit,60); }
+  window.GNR_fit=fit;
+  function sync(){
+    var a=document.querySelector('.screen.active');
+    document.body.classList.toggle('gnr-wide', !!(a && IDS.test(a.id)));
+    queueFit();
+  }
+  window.addEventListener('resize',queueFit);
+  if(window.ResizeObserver){ var ro=new ResizeObserver(function(){ if(!fitting) queueFit(); }); [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ var p=s.querySelector(':scope>.panel'); if(p) ro.observe(p); }); }
+  [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ if(/^scr-lesson\d$/.test(s.id)) build(s); });   /* pitwalk: ขยายกว้าง + การ์ด 2 คอลัมน์ด้วย CSS */
+  sync();
+  if(window.MutationObserver){ var mo=new MutationObserver(sync); [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ mo.observe(s,{attributes:true,attributeFilter:['class']}); }); }
 })();

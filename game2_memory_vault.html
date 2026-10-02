@@ -2095,6 +2095,49 @@ body.gnr-sum .wrap{padding-top:10px;padding-bottom:10px}
   radial-gradient(900px 600px at 12% -10%,var(--ember-dim),transparent 60%),
   radial-gradient(800px 600px at 92% 8%,rgba(251,191,36,.08),transparent 60%),
   linear-gradient(180deg,var(--bg),var(--bg-grad-mid,#e9edf3) 60%,var(--bg))}
+
+/* ---------- 5) จอคอมพิวเตอร์: ทุกหน้าอยู่ในจอเดียว ไม่ต้องเลื่อน (UI v7.1, 2 ต.ค. 2569) ----------
+   - หน้าแรก: ภาพ/ชื่อเกมซ้าย บัตรลงทะเบียนขวา
+   - หน้าบทเรียน/ห้องทดลอง: ขยายความกว้างและจัดเนื้อหาเป็น 2 คอลัมน์ (gnr_core.js จัดกลุ่มหัวข้อให้ไม่ขาดกลางตาราง)
+   - footer ย่อเหลือแถบบาง มือถือและแท็บเล็ตแนวตั้งยังเป็นแบบเดิมทุกอย่าง */
+.gnr-flow,.gnr-blk{display:contents}
+@media (min-width:1100px){
+  footer{margin-top:8px;padding:7px 16px 9px}
+  footer p{display:inline;font-size:.72rem;line-height:1.5}
+  footer p+p::before{content:" · "}
+  footer .fmono{font-size:.62rem}
+  #scr-welcome .hero{min-height:calc(100dvh - 96px);display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,500px);
+    grid-template-rows:auto auto auto auto;align-content:center;align-items:center;column-gap:clamp(28px,4vw,64px);
+    max-width:1240px;margin:0 auto;padding:16px 24px;text-align:center}
+  #scr-welcome .hero>*{grid-column:1}
+  #scr-welcome .hero>.login-card{grid-column:2;grid-row:1/span 4;width:100%;margin:0;align-self:center}
+  #scr-welcome .cityart{width:auto;max-width:100%;height:min(300px,34dvh);justify-self:center}
+  #scr-welcome .title{font-size:clamp(1.6rem,2.6vw,2.5rem)}
+  #scr-welcome .subtitle{margin:4px auto 0}
+  #scr-welcome .feature-row{margin-top:14px}
+}
+@media (min-width:1200px){
+  body.gnr-wide .wrap,body.gnr-wide .topbar-in{max-width:min(1760px,96vw)}
+  body.gnr-wide .wrap{padding-top:10px;padding-bottom:8px}
+  .screen.gnr-cols>.panel{padding:16px 22px}
+  .screen.gnr-cols>.panel>h2{margin-bottom:6px}
+  .gnr-flow{display:block;column-count:2;column-gap:30px;column-fill:balance}
+  .gnr-blk{display:block;break-inside:avoid;page-break-inside:avoid;padding-bottom:2px}
+  .gnr-blk>:first-child{margin-top:0}
+  .gnr-flow .tbl-wrap,.gnr-flow .codebox{max-width:100%}
+}
+@media (min-width:1200px) and (min-height:900px){ .gnr-flow{column-gap:40px} }
+@media (min-width:1100px) and (max-height:760px){
+  .wrap{padding-top:8px;padding-bottom:6px}
+  .panel{padding:16px 20px}
+  .howto{margin-top:8px}
+}
+@media (min-width:1100px) and (max-height:820px){
+  .gnr-flow .stage svg{max-height:30dvh;width:auto;max-width:100%;margin:0 auto}
+  .gnr-flow .codebox,.gnr-flow pre{line-height:1.45}
+  .gnr-flow .tbl-wrap td,.gnr-flow .tbl-wrap th{padding-top:6px;padding-bottom:6px}
+}
+@media (min-width:1200px){ body.gnr-wide #pitGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} body.gnr-wide #pitGrid>*{margin:0} }
 </style>
 <script>window.GNR_CFG={game:'game2',title:'MEMORY VAULT',padExtra:16};</script>
 <script id="gnr-core-js">
@@ -2471,7 +2514,63 @@ body.gnr-sum .wrap{padding-top:10px;padding-bottom:10px}
   setupChrome(); setupLogin(); setupArcade(); wrap();
   if(window.MutationObserver){ new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var n=ms[i].target; if(n.closest && !n.closest('#arcade') && !n.closest('.chartbox')){ queueSvgFix(); return; } } }).observe(document.body,{childList:true,subtree:true}); }
   queueSvgFix();
-  var foot=document.querySelector('footer .fmono'); if(foot) foot.textContent+=' · UI v7.0';
+  var foot=document.querySelector('footer .fmono'); if(foot) foot.textContent+=' · UI v7.1';
+})();
+
+/* ---------- 5) จอคอมพิวเตอร์: จัดหน้าบทเรียนเป็น 2 คอลัมน์ (UI v7.1) ----------
+   ห่อเนื้อหาเป็นกลุ่ม (หัวข้อ h3 ติดกับเนื้อหาถัดไป · ห้องทดลองทั้งชุดเป็นกลุ่มเดียว) แล้วให้ CSS แบ่งคอลัมน์
+   ย้ายโหนดเดิม ไม่คัดลอก จึงไม่กระทบ id/ตัวจัดการเหตุการณ์ของเกม · จอเล็กกว่า 1200px กลุ่มเป็น display:contents (เหมือนเดิม) */
+(function(){
+  'use strict';
+  var IDS=/^scr-(lesson\d|pitwalk)$/;
+  function blk(){ var d=document.createElement('div'); d.className='gnr-blk'; return d; }
+  function isText(n){ return n.tagName==='P' || n.classList.contains('status-line') || n.classList.contains('readout-line'); }
+  function build(sec){
+    var panel=sec.querySelector(':scope>.panel'); if(!panel||panel.querySelector('.gnr-flow')) return;
+    var kids=[].slice.call(panel.children), i=0;
+    while(i<kids.length && (kids[i].classList.contains('tag')||/^H[12]$/.test(kids[i].tagName))) i++;   /* หัวเรื่องอยู่นอกคอลัมน์ */
+    var end=kids.length; if(end>i && kids[end-1].classList.contains('btn-row')) end--;                     /* ปุ่มไปต่อท้ายสุดอยู่นอกคอลัมน์ */
+    var body=kids.slice(i,end); if(body.length<3) return;
+    var flow=document.createElement('div'); flow.className='gnr-flow';
+    panel.insertBefore(flow, kids[end]||null);
+    var cur=null, keep=0, lab=false;
+    body.forEach(function(n){
+      if(n.tagName==='H3'){ lab=/ห้องทดลอง|LAB|ทดลอง/i.test(n.textContent); cur=blk(); if(lab) cur.classList.add('gnr-lab'); flow.appendChild(cur); cur.appendChild(n); keep=1; return; }
+      if(lab){ cur.appendChild(n); return; }
+      if(cur && keep){ cur.appendChild(n); if(!isText(n)) keep=0; return; }
+      if(isText(n) && cur && cur.lastElementChild && isText(cur.lastElementChild)){ cur.appendChild(n); return; }
+      cur=blk(); flow.appendChild(cur); cur.appendChild(n);
+      if(isText(n)) keep=1; else keep=0;   /* ย่อหน้าบรรยายติดกับภาพ/ตารางที่ตามมา */
+    });
+    sec.classList.add('gnr-cols');
+  }
+  /* ย่อทั้งหน้าลงเล็กน้อย (ไม่ต่ำกว่า 80% · จอกว้าง >= 1700px ไม่ต่ำกว่า 75%) เมื่อเนื้อหายาวเกินจอไม่มาก เพื่อให้ไม่ต้องเลื่อน · เฉพาะจอคอม (กว้าง >= 1100px และใช้เมาส์) */
+  var MINZ=0.8, fitT=0, fitting=false;
+  function desk(){ return innerWidth>=1100 && !(window.matchMedia && matchMedia('(pointer:coarse)').matches); }
+  function fit(){
+    if(fitting) return; fitting=true;
+    var a=document.querySelector('.screen.active'), z=1;
+    [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ if(s!==a) s.style.zoom=''; });
+    if(a && desk() && !document.body.classList.contains('gnr-sum')){
+      a.style.zoom='';
+      var doc=document.documentElement.scrollHeight, h=a.getBoundingClientRect().height, over=doc-innerHeight;
+      if(over>2 && h>0){ z=Math.max(innerWidth>=1700?0.75:MINZ, Math.floor((h-over-6)/h*100)/100); }
+      a.style.zoom = z<1 ? String(z) : '';
+    } else if(a){ a.style.zoom=''; }
+    fitting=false;
+  }
+  function queueFit(){ clearTimeout(fitT); fitT=setTimeout(fit,60); }
+  window.GNR_fit=fit;
+  function sync(){
+    var a=document.querySelector('.screen.active');
+    document.body.classList.toggle('gnr-wide', !!(a && IDS.test(a.id)));
+    queueFit();
+  }
+  window.addEventListener('resize',queueFit);
+  if(window.ResizeObserver){ var ro=new ResizeObserver(function(){ if(!fitting) queueFit(); }); [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ var p=s.querySelector(':scope>.panel'); if(p) ro.observe(p); }); }
+  [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ if(/^scr-lesson\d$/.test(s.id)) build(s); });   /* pitwalk: ขยายกว้าง + การ์ด 2 คอลัมน์ด้วย CSS */
+  sync();
+  if(window.MutationObserver){ var mo=new MutationObserver(sync); [].slice.call(document.querySelectorAll('.screen')).forEach(function(s){ mo.observe(s,{attributes:true,attributeFilter:['class']}); }); }
 })();
 </script>
 <!-- GNR-CORE:END -->
