@@ -2514,7 +2514,10 @@ body.gnr-sum .wrap{padding-top:10px;padding-bottom:10px}
   setupChrome(); setupLogin(); setupArcade(); wrap();
   if(window.MutationObserver){ new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var n=ms[i].target; if(n.closest && !n.closest('#arcade') && !n.closest('.chartbox')){ queueSvgFix(); return; } } }).observe(document.body,{childList:true,subtree:true}); }
   queueSvgFix();
-  var foot=document.querySelector('footer .fmono'); if(foot) foot.textContent+=' · UI v7.1';
+  /* เลขเวอร์ชันที่ผู้ใช้เห็นมีชุดเดียว: เกมบทเรียน GNR1007 vX.Y (เลขภายในของแต่ละเกม/CORE อยู่ใน README) */
+  var GNR_SUITE='เกมบทเรียน GNR1007 v7.2', GNR_HUB='https://kalahad.github.io/gnr1007/';
+  var foot=document.querySelector('footer .fmono'); if(foot){ foot.textContent=(CFG.title||'')+' · '+GNR_SUITE;
+    var hp=document.createElement('p'); hp.style.marginTop='4px'; hp.innerHTML='<a href="'+GNR_HUB+'" style="color:inherit;text-decoration:underline;text-underline-offset:2px">ศูนย์รวมเครื่องมือ GNR1007</a>'; foot.parentNode.appendChild(hp); }
 })();
 
 /* ---------- 5) จอคอมพิวเตอร์: จัดหน้าบทเรียนเป็น 2 คอลัมน์ (UI v7.1) ----------
